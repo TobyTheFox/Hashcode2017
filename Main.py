@@ -10,7 +10,6 @@ reqDescCount = 0
 cacheServerCount = 0
 capacity = 0
 
-
 def getEndpointsConnectedToCache(cacheID, endpoints):
     '''returns list of endpoints connected to a cache'''
     connectedEndpoints = []
@@ -80,11 +79,13 @@ def readFile():
     videos = []
     #[size]
     endpoints = []
-    #[latency, connected cache, [conncection1 id, connection1 latency] [connection2...]]
+    #[latency, connected cachetotal, [conncection1 id, connection1 latency] [connection2...]]
     requests = []
     #[video id, endpoint id, number of requests]
     
     videos = f.readline()[:-1].split(" ")
+    for videoIndex in range(len(videos)):
+        videos[videoIndex] = int(videos[videoIndex])
 
     for endpointIndex in range(endpointCount):
         endpoint = f.readline()[:-1].split(" ")
@@ -99,7 +100,11 @@ def readFile():
         endpoints.append(endpoint)
                    
     for request in range(reqDescCount):
-        requests.append(f.readline()[:-1].split(" "))
+        request = f.readline()[:-1].split(" ")
+        for itemIndex in range(len(request)):
+            request[itemIndex] = int(request[itemIndex])
+        requests.append(request)
+        
 
     return [videos, endpoints, requests]
 
@@ -141,49 +146,11 @@ def findBasicSolution(data):
 
     return allocatedVideosByCache
 
-
-def connectedCaches(endpoint):
-    endpoints = data[1]
-    currentEndpoint = endpoints[endpoint]
-    connectedCaches = []
-    count = 0
-    for item in currentEndpoint:
-        if count == (0 or 1):
-            count += 1
-        else:
-            connectedCaches.append(item)
-    return connectedCaches        
-
-
-def cachetime(videoID,endpoint):
-    endpoints = data[1]
-    endpoint = endpoints[endpoint]
-    connectedCaches = connectedCaches(endpoint)
-    
-    lat = endpoint[0]
-    
-    for cache in connectedCaches:
-        cacheID = cache[0]
-        if videoID in solution[cacheID]:
-            if lat >= cache[1]:
-                
-                lat = cache[1]
-    return endpoint[0] - lat
-
-def evaluation(requests):
-    
-    for request in requests:
-        
-        videoID = request[0]
-        endpoint = request[1]
-        conCache = connectedCaches(endpoint)
-        cacheTime = cachetime(videoID,endpoint)
-        timeSaved += cacheTime*request[2]       
-    return timeSaved * 1000
-
-
+random.seed()
 
 data = readFile()
-
+##getPopularVideosInEndpoint(0,data[2])
+##getEndpointsConnectedToCache(0,data[1])
+#print(getPopularVideosForCache(0,data))
 basicSolution = findBasicSolution(data)
 encode(basicSolution)
