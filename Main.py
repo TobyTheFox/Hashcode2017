@@ -49,7 +49,23 @@ def readFile(filename):
 
     return [videos, endpoints, requests]
 
+def evaluation(requests):
+    for request in requests:
+        endpoint = requests[1]
+        connectedCaches=[]
+        for item in range (2,len(endpoints[endpoint])):
+             connectedCaches.append(item)
+                           
+        for item in connectedCaches:
+            
+            videosStored = caches[item[1]]
+            if request[1] in videosStored:
+                timeSave = (endpoints[endpoint[0]]-item[1]) * request[3]
+                return timeSave
 
+
+            
 random.seed()
 
 data = readFile(NAME)
+evaluation(requests)
