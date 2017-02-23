@@ -49,23 +49,63 @@ def readFile(filename):
 
     return [videos, endpoints, requests]
 
+##def evaluation(requests):
+##    endpoints = data[1]
+##    requests = data[2]
+##    caches = [[1],[1],[1]]
+##    for request in requests:
+##        endpoint = request[1]
+##        connectedCaches=[]
+##        for item in range (2,len(endpoints[int(endpoint)])):
+##             connectedCaches.append(item)
+##                           
+##        for item in connectedCaches:
+##            
+##            videosStored = caches[item[0]]
+##            if request[1] in videosStored:
+##                timeSave = (endpoints[endpoint[0]]-item[1]) * request[3]
+##                return timeSave
+def connectedCaches(endpoint):
+    endpoints = data[1]
+    currentEndpoint = endpoints[endpoint]
+    connectedCaches = []
+    count = 0
+    for item in currentEndpoint:
+        if count == (0 or 1):
+            count += 1
+        else:
+            connectedCaches.append(item)
+    return connectedCaches        
+
+
+def cachetime(videoID,endpoint):
+    endpoints = data[1]
+    endpoint = endpoints[endpoint]
+    connectedCaches = connectedCaches(endpoint)
+    
+    lat = endpoint[0]
+    
+    for cache in connectedCaches:
+        cacheID = cache[0]
+        if videoID in solution[cacheID]:
+            if lat >= cache[1]:
+                
+                lat = cache[1]
+    return endpoint[0] - lat
+
+
 def evaluation(requests):
+    
     for request in requests:
-        endpoint = requests[1]
-        connectedCaches=[]
-        for item in range (2,len(endpoints[endpoint])):
-             connectedCaches.append(item)
-                           
-        for item in connectedCaches:
-            
-            videosStored = caches[item[1]]
-            if request[1] in videosStored:
-                timeSave = (endpoints[endpoint[0]]-item[1]) * request[3]
-                return timeSave
-
-
+        
+        videoID = request[0]
+        endpoint = request[1]
+        conCache = connectedCaches(endpoint)
+        cacheTime = cachetime(videoID,endpoint)
+        timeSaved += cacheTime*request[2]       
+    return timeSaved * 1000
             
 random.seed()
-
+requests = [[1,1,100]]
 data = readFile(NAME)
-evaluation(requests)
+
