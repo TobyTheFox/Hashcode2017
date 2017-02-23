@@ -1,30 +1,52 @@
 import random
+NAME = "me_at_the_zoo"
 
+videoCount = 0
+endpointCount = 0
+reqDescCount = 0
+cacheServerCount = 0
+capacity = 0
 
-def readFile():
-    def readFile(filename):
-    global rows
-    global cols
-    global minIngredient
-    global maxCells
+def readFile(filename):
+    global videoCount
+    global endpointCount
+    global reqDescCount
+    global cacheServerCount
+    global capacity
     
     f = open(filename+".in", 'r')
     params = f.readline()
     paramlist = params.split(" ")
+    videoCount = int(paramlist[0])
+    endpointCount = int(paramlist[1])
+    reqDescCount = int(paramlist[2])
+    cacheServerCount = int(paramlist[3])
+    capacity = int(paramlist[4])
 
-    rows.append(int(paramlist[0]))
-    cols.append(int(paramlist[1]))
-    minIngredient.append(int(paramlist[2]))
-    maxCells.append(int(paramlist[3]))
-
-    pizza = []
+    videos = []
+    #[size]
+    endpoints = []
+    #[latency, connected cache, [conncection1 id, connection1 latency] [connection2...]]
+    requests = []
+    #[video id, endpoint id, number of requests]
     
-    for row in range(rows[-1]):
-        pizza.append(f.readline()[:-1])
+    videos = f.readline()[:-1].split(" ")
 
-    return pizza
+    for endpointIndex in range(endpointCount):
+        endpoint = f.readline()[:-1].split(" ")
+        for endIndex in range(len(endpoint)):
+            endpoint[endIndex] = int(endpoint[endIndex])
+        
+        for connection in range(endpoint[-1]):
+            endpoint.append(f.readline()[:-1])
+        endpoints.append(endpoint)
+                   
+    for request in range(reqDescCount):
+        requests.append(f.readline()[:-1].split(" "))
+
+    return [videos, endpoints, requests]
 
 
 random.seed()
 
-data = readFile()
+data = readFile(NAME)
