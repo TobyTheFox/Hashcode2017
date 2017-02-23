@@ -1,4 +1,5 @@
 import random
+from operator import itemgetter
 NAME = "me_at_the_zoo"
 
 videoCount = 0
@@ -6,6 +7,20 @@ endpointCount = 0
 reqDescCount = 0
 cacheServerCount = 0
 capacity = 0
+
+
+
+
+def getPopularVideosInEndpoint(endpointID,requests):
+    '''returns sorted list of video ids'''
+    popularVideos = []
+    #[vidid, requests]
+    for request in requests:
+        if request[1] == endpointID:
+            popularVideos.append([request[0],request[2]])
+    popularVideos= sorted(popularVideos, key=itemgetter(1))
+    popularVideos.reverse()
+    return popularVideos
 
 def readFile(filename):
     global videoCount
@@ -45,7 +60,11 @@ def readFile(filename):
         endpoints.append(endpoint)
                    
     for request in range(reqDescCount):
-        requests.append(f.readline()[:-1].split(" "))
+        request = f.readline()[:-1].split(" ")
+        for itemIndex in range(len(request)):
+            request[itemIndex] = int(request[itemIndex])
+        requests.append(request)
+        
 
     return [videos, endpoints, requests]
 
@@ -53,3 +72,4 @@ def readFile(filename):
 random.seed()
 
 data = readFile(NAME)
+print(getPopularVideosInEndpoint(0,data[2]))
