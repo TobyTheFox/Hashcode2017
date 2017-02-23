@@ -1,6 +1,8 @@
 import random
 from operator import itemgetter
-NAME = "me_at_the_zoo"
+NAME = "trending_today"
+RANDOM_FACTOR1 = 300
+RANDOM_FACTOR2 = 3000
 
 videoCount = 0
 endpointCount = 0
@@ -19,11 +21,17 @@ def getEndpointsConnectedToCache(cacheID, endpoints):
     return connectedEndpoints
     
 def getPopularVideosForCache(cacheID, data):
+    print("GET POPULAR VIDEOS FOR CACHE ",cacheID)
     connectedEndpoints = getEndpointsConnectedToCache(cacheID,data[1])
+    connectedEndpointIDs = []
     allVideos = []
     for connectedEndpoint in connectedEndpoints:
-        allVideos += getPopularVideosInEndpoint(connectedEndpoint,data[2])
+        #allVideos += getPopularVideosInEndpoint(connectedEndpoint,data[2])
+        connectedEndpointIDs.append(connectedEndpoint)
 
+    for i in range(RANDOM_FACTOR1):
+        allVideos += getPopularVideosInEndpoint(random.choice(connectedEndpointIDs),data[2])
+    
     uniqueVideos = []
     for video in allVideos:
         for uniqueVideoIndex in range(len(uniqueVideos)):
@@ -34,14 +42,16 @@ def getPopularVideosForCache(cacheID, data):
             uniqueVideos.append(video)
     popularVideos= sorted(uniqueVideos, key=itemgetter(1))
     popularVideos.reverse()
-    
     return popularVideos
 
 def getPopularVideosInEndpoint(endpointID,requests):
     '''returns sorted list of video ids'''
+    #print("GET POPUAR VIDEOS IN ENDPOINT")
     popularVideos = []
     #[vidid, requests]
-    for request in requests:
+    #for request in requests:
+    for i in range(RANDOM_FACTOR2):
+        request = random.choice(requests)
         if request[1] == endpointID:
             popularVideos.append([request[0],request[2]])
     #print("POP",popularVideos)
@@ -50,14 +60,14 @@ def getPopularVideosInEndpoint(endpointID,requests):
     return popularVideos
 
 
-def readFile(filename):
+def readFile():
     global videoCount
     global endpointCount
     global reqDescCount
     global cacheServerCount
     global capacity
     
-    f = open(filename+".in", 'r')
+    f = open(NAME+".in", 'r')
     params = f.readline()
     paramlist = params.split(" ")
     videoCount = int(paramlist[0])
@@ -98,11 +108,49 @@ def readFile(filename):
 
     return [videos, endpoints, requests]
 
+def allocateVideos(videosAndPopularity, data):
+    '''returns list of videosIDs that can be added considering server capacity'''
+    '''Input is sorted in order of preference'''
+    allocatedVideos = []
+    currentCapacity = capacity
+    videoSizes = data[0]
+    for videoPop in videosAndPopularity:
+        #print(currentCapacity)
+        currentVideoID = videoPop[0]
+        if currentCapacity - videoSizes[currentVideoID] > 0:
+            allocatedVideos.append(currentVideoID)
+            currentCapacity -= videoSizes[currentVideoID]
+
+    return allocatedVideos
+
+    
+def encode(solution):
+    '''solution is list of videos on each cache'''
+    f = open(NAME+".out", 'w')
+    f.write(str(len(solution))+"\n")
+    for serverIndex in range(len(solution)):
+        f.write(str(serverIndex))
+        for video in solution[serverIndex]:
+              f.write(" " + str(video))
+        f.write("\n")
+
+
+    f.close()
+
+def findBasicSolution(data):
+    '''Finds most popular videos on each cache and allocates them'''
+    allocatedVideosByCache = []
+    for cacheIndex in range(cacheServerCount):
+        cacheSolution = getPopularVideosForCache(cacheIndex,data)
+        allocatedVideosByCache.append(allocateVideos(cacheSolution, data))
+
+    return allocatedVideosByCache
 
 random.seed()
 
-data = readFile(NAME)
+data = readFile()
 ##getPopularVideosInEndpoint(0,data[2])
 ##getEndpointsConnectedToCache(0,data[1])
-                         
-print(getPopularVideosForCache(0,data))
+#print(getPopularVideosForCache(0,data))
+basicSolution = findBasicSolution(data)
+encode(basicSolution)
