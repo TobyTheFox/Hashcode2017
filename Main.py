@@ -38,7 +38,10 @@ def readFile(filename):
             endpoint[endIndex] = int(endpoint[endIndex])
         
         for connection in range(endpoint[-1]):
-            endpoint.append(f.readline()[:-1])
+            endpoint.append(f.readline()[:-1].split(" "))
+            for elementIndex in range(len(endpoint[-1])):
+                endpoint[-1][elementIndex] = int(endpoint[-1][elementIndex])
+        
         endpoints.append(endpoint)
                    
     for request in range(reqDescCount):
